@@ -66,7 +66,7 @@ func move(current_tile: Vector2i, direction:Vector2i):
 	# note: ice tiles and arrow tiles are both walkable and slidable
 	if target_tile_data.get_custom_data("slidable") == true:
 		if (target_tile_data.get_custom_data("direction") != ""):
-			slide_last_tile = getSlideLastTile(target_tile, direction)
+			slide_last_tile = getSlideLastTile(current_tile, target_tile, direction)
 		target_tile = slide_last_tile
 		# resets the player in the starting point (try not to change the map cuz i hard core the position)
 		#target_tile = Vector2i(2,4)
@@ -82,8 +82,9 @@ func move(current_tile: Vector2i, direction:Vector2i):
 	global_position = tile_map.map_to_local(target_tile)
 	sprite_2d.global_position = tile_map.map_to_local(current_tile)
 	
-func getSlideLastTile(current_tile: Vector2i, direction:Vector2i):
-	var slide_target_tile = current_tile
+func getSlideLastTile(current_tile, target_tile: Vector2i, direction:Vector2i):
+	var prev_slide_target_tile = current_tile
+	var slide_target_tile = target_tile
 	var slide_tile_data: TileData = tile_map.get_cell_tile_data(slide_target_tile)
 	
 	while (slide_tile_data.get_custom_data("slidable") == true) and (slide_tile_data.get_custom_data("walkable") == true):
@@ -91,6 +92,7 @@ func getSlideLastTile(current_tile: Vector2i, direction:Vector2i):
 			slide_target_tile += Vector2i(direction)
 			slide_tile_data = tile_map.get_cell_tile_data(slide_target_tile)
 		elif (slide_tile_data.get_custom_data("direction") == 'DOWN'):
+
 			slide_target_tile += Vector2i(0,1)
 			slide_tile_data = tile_map.get_cell_tile_data(slide_target_tile)
 		elif (slide_tile_data.get_custom_data("direction") == 'UP'):
@@ -118,7 +120,22 @@ func getSlideLastTile(current_tile: Vector2i, direction:Vector2i):
 		
 	return(slide_target_tile)
 
-func movePlayer(target_tile, current_tile):
+func ForcemovePlayer(target_tile, current_tile):
 	is_moving = true
 	global_position = tile_map.map_to_local(target_tile)
 	sprite_2d.global_position = tile_map.map_to_local(current_tile)
+	while global_position != sprite_2d.global_position:
+		sprite_2d.global_position = sprite_2d.global_position.move_toward(global_position, 1)
+		if AnimDirection == 'UP':
+			sprite_2d.flip_h = false
+			sprite_2d.play('up')
+		elif AnimDirection == 'DOWN':
+			sprite_2d.flip_h = false
+			sprite_2d.play('down')
+		elif AnimDirection == "LEFT":
+			sprite_2d.flip_h = false
+			sprite_2d.play('left')
+		elif AnimDirection == "RIGHT":
+			sprite_2d.flip_h = true
+			sprite_2d.play('right')
+	print('asdasd')
